@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { LayoutDashboard, Package, Users, FileText, Database } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ThemeToggle } from '../ui/ThemeToggle'
 
 const routes = [
     { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
@@ -13,8 +14,9 @@ const routes = [
 export function Sidebar({ className, onItemClick }: { className?: string; onItemClick?: () => void }) {
     return (
         <aside className={cn("w-64 border-r bg-muted/40 min-h-screen flex flex-col", className)}>
-            <div className="p-6 border-b flex items-center h-16">
+            <div className="p-6 border-b flex items-center justify-between h-16">
                 <h2 className="text-lg font-semibold tracking-tight">Easy</h2>
+                <ThemeToggle />
             </div>
             <nav className="flex-1 py-4 space-y-1">
                 {routes.map((route) => (

@@ -111,12 +111,12 @@ export default function ResellerDetailPage() {
                     </CardContent>
                 </Card>
 
-                <Card className={balance > 0 ? "border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900" : "border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-900"}>
+                <Card className={balance > 0 ? "border-debt/20 bg-debt/5" : "border-payment/20 bg-payment/5"}>
                     <CardHeader>
                         <CardTitle className="text-lg text-center md:text-left">Saldo Devedor Atual</CardTitle>
                     </CardHeader>
                     <CardContent className="flex flex-col items-center md:items-start">
-                        <div className={`text-4xl font-extrabold ${balance > 0 ? "text-red-700 dark:text-red-400" : "text-green-700 dark:text-green-400"}`}>
+                        <div className={`text-4xl font-extrabold ${balance > 0 ? "text-debt" : "text-payment"}`}>
                             R$ {balance.toFixed(2)}
                         </div>
                         <p className="text-sm font-medium mt-2 text-muted-foreground">

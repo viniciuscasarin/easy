@@ -37,7 +37,7 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                                     </div>
                                     <div className={cn(
                                         "px-2 py-0.5 rounded-full text-xs font-semibold",
-                                        t.type === 'order' ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                                        t.type === 'order' ? "bg-debt/10 text-debt" : "bg-payment/10 text-payment"
                                     )}>
                                         {t.type === 'order' ? 'Pedido' : t.type === 'payment' ? 'Pagamento' : 'Sinal'}
                                     </div>
@@ -60,7 +60,7 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                                     </div>
                                     <div className={cn(
                                         "text-lg font-bold flex items-center gap-1",
-                                        t.type === 'order' ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"
+                                        t.type === 'order' ? "text-debt" : "text-payment"
                                     )}>
                                         <CircleDollarSign size={18} />
                                         {formatCurrency(t.totalPrice)}
@@ -111,7 +111,7 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                                 <TableCell>{t.quantity ? t.quantity : '-'}</TableCell>
                                 <TableCell className={cn(
                                     "font-medium",
-                                    t.type === 'order' ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
+                                    t.type === 'order' ? 'text-debt' : 'text-payment'
                                 )}>
                                     {formatCurrency(t.totalPrice)}
                                 </TableCell>

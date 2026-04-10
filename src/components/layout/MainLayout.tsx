@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
 import { useState } from 'react'
+import { ThemeToggle } from '../ui/ThemeToggle'
 
 export function MainLayout() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -25,6 +26,9 @@ export function MainLayout() {
                         </SheetContent>
                     </Sheet>
                     <div className="ml-4 font-semibold text-lg">Easy</div>
+                    <div className="ml-auto">
+                        <ThemeToggle />
+                    </div>
                 </header>
 
                 <main className="flex-1 overflow-y-auto">

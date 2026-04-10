@@ -73,7 +73,7 @@ export function ItemTable({ items, onEdit }: ItemTableProps) {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 text-lg font-semibold text-muted-foreground">
-                                    <CircleDollarSign size={20} className="text-green-600 dark:text-green-400" />
+                                    <CircleDollarSign size={20} className="text-payment" />
                                     <span>{formatCurrency(item.basePrice)}</span>
                                 </div>
                             </CardContent>

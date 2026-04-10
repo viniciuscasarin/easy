@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { ThemeProvider } from 'next-themes'
 import { MainLayout } from './components/layout/MainLayout'
 import DashboardPage from './pages/DashboardPage'
 import ItemsPage from './pages/ItemsPage'
@@ -10,19 +11,21 @@ import { Toaster } from './components/ui/sonner'
 
 function App() {
   return (
-    <BrowserRouter basename="/easy/">
-      <Routes>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/items" element={<ItemsPage />} />
-          <Route path="/resellers" element={<ResellersPage />} />
-          <Route path="/resellers/:id" element={<ResellerDetailPage />} />
-          <Route path="/transactions" element={<TransactionsPage />} />
-          <Route path="/backup" element={<BackupPage />} />
-        </Route>
-      </Routes>
-      <Toaster />
-    </BrowserRouter>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <BrowserRouter basename="/easy/">
+        <Routes>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/items" element={<ItemsPage />} />
+            <Route path="/resellers" element={<ResellersPage />} />
+            <Route path="/resellers/:id" element={<ResellerDetailPage />} />
+            <Route path="/transactions" element={<TransactionsPage />} />
+            <Route path="/backup" element={<BackupPage />} />
+          </Route>
+        </Routes>
+        <Toaster />
+      </BrowserRouter>
+    </ThemeProvider>
   )
 }
 
