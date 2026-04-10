@@ -10,14 +10,10 @@ import {
     TableRow,
 } from "../ui/table";
 import { Button } from "../ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "../ui/dialog";
+import { ResponsiveDialog } from "../ui/ResponsiveDialog";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import { Card, CardContent } from "../ui/card";
+import { Tag, CircleDollarSign } from "lucide-react";
 
 interface ItemTableProps {
     items: Item[];
@@ -25,6 +21,7 @@ interface ItemTableProps {
 }
 
 export function ItemTable({ items, onEdit }: ItemTableProps) {
+    const isDesktop = useMediaQuery("(min-width: 1024px)");
     const deleteMutation = useDeleteItem();
     const [itemToDelete, setItemToDelete] = useState<Item | null>(null);
 
@@ -42,9 +39,83 @@ export function ItemTable({ items, onEdit }: ItemTableProps) {
         }
     };
 
+    if (!isDesktop) {
+        return (
+            <div className="space-y-4">
+                {items.length === 0 ? (
+                    <div className="text-center py-10 bg-card rounded-lg border border-dashed text-muted-foreground">
+                        Nenhum item cadastrado.
+                    </div>
+                ) : (
+                    items.map((item) => (
+                        <Card key={item.id} className="overflow-hidden">
+                            <CardContent className="p-4 space-y-4">
+                                <div className="flex justify-between items-start">
+                                    <div className="font-bold text-lg text-primary flex items-center gap-2">
+                                        <Tag size={18} />
+                                        {item.name}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => onEdit(item)}
+                                        >
+                                            Editar
+                                        </Button>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={() => setItemToDelete(item)}
+                                        >
+                                            Excluir
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 text-lg font-semibold text-muted-foreground">
+                                    <CircleDollarSign size={20} className="text-green-600 dark:text-green-400" />
+                                    <span>{formatCurrency(item.basePrice)}</span>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))
+                )}
+
+                <ResponsiveDialog
+                    open={!!itemToDelete}
+                    onOpenChange={(open) => !open && setItemToDelete(null)}
+                    title="Excluir Item"
+                    description={`Tem certeza que deseja excluir o item "${itemToDelete?.name}"? Esta ação não pode ser desfeita.`}
+                    footer={
+                        <>
+                            <Button
+                                variant="outline"
+                                onClick={() => setItemToDelete(null)}
+                                disabled={deleteMutation.isPending}
+                            >
+                                Cancelar
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={handleDelete}
+                                disabled={deleteMutation.isPending}
+                            >
+                                {deleteMutation.isPending ? "Excluindo..." : "Confirmar Exclusão"}
+                            </Button>
+                        </>
+                    }
+                >
+                    <div className="py-2 text-sm text-muted-foreground">
+                        A exclusão removerá o item do catálogo permanentemente.
+                    </div>
+                </ResponsiveDialog>
+            </div>
+        );
+    }
+
     return (
         <div>
-            <div className="rounded-md border">
+            <div className="rounded-md border bg-card overflow-hidden">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -88,15 +159,13 @@ export function ItemTable({ items, onEdit }: ItemTableProps) {
                 </Table>
             </div>
 
-            <Dialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Excluir Item</DialogTitle>
-                        <DialogDescription>
-                            Tem certeza que deseja excluir o item "{itemToDelete?.name}"? Esta ação não pode ser desfeita.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
+            <ResponsiveDialog
+                open={!!itemToDelete}
+                onOpenChange={(open) => !open && setItemToDelete(null)}
+                title="Excluir Item"
+                description={`Tem certeza que deseja excluir o item "${itemToDelete?.name}"? Esta ação não pode ser desfeita.`}
+                footer={
+                    <>
                         <Button
                             variant="outline"
                             onClick={() => setItemToDelete(null)}
@@ -111,9 +180,13 @@ export function ItemTable({ items, onEdit }: ItemTableProps) {
                         >
                             {deleteMutation.isPending ? "Excluindo..." : "Confirmar Exclusão"}
                         </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                    </>
+                }
+            >
+                <div className="text-sm text-muted-foreground">
+                    Esta ação não pode ser desfeita.
+                </div>
+            </ResponsiveDialog>
         </div>
     );
 }

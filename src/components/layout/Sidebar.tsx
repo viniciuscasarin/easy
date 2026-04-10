@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { LayoutDashboard, Package, Users, FileText, Database } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const routes = [
     { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
@@ -9,9 +10,9 @@ const routes = [
     { path: '/backup', label: 'Backup', icon: <Database size={20} /> },
 ]
 
-export function Sidebar() {
+export function Sidebar({ className, onItemClick }: { className?: string; onItemClick?: () => void }) {
     return (
-        <aside className="w-64 border-r bg-muted/40 min-h-screen flex flex-col">
+        <aside className={cn("w-64 border-r bg-muted/40 min-h-screen flex flex-col", className)}>
             <div className="p-6 border-b flex items-center h-16">
                 <h2 className="text-lg font-semibold tracking-tight">Easy</h2>
             </div>
@@ -20,6 +21,7 @@ export function Sidebar() {
                     <NavLink
                         key={route.path}
                         to={route.path}
+                        onClick={onItemClick}
                         className={({ isActive }) =>
                             `flex items-center gap-3 px-6 py-2.5 hover:bg-muted transition-colors ${isActive ? 'bg-muted font-medium border-r-2 border-primary' : 'text-muted-foreground'
                             }`

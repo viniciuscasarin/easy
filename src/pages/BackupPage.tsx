@@ -3,12 +3,18 @@ import ImportExport from '@/components/backup/ImportExport';
 
 export default function BackupPage() {
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Backup &amp; Restore</h1>
-            <p className="mb-4 text-muted-foreground">
-                Use the buttons below to export the current application data to a JSON file or import a previously exported backup. Importing will replace all existing data.
-            </p>
-            <ImportExport />
+        <div className="p-4 lg:p-6 space-y-6">
+            <div className="max-w-4xl mx-auto space-y-6">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight">Backup &amp; Restore</h1>
+                    <p className="text-muted-foreground">
+                        Use os botões abaixo para exportar os dados atuais para um arquivo JSON ou importar um backup anterior.
+                    </p>
+                </div>
+                <div className="bg-card rounded-xl border p-4 sm:p-6">
+                    <ImportExport />
+                </div>
+            </div>
         </div>
     );
 }

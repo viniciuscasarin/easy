@@ -4,7 +4,7 @@ import { useTransactions } from '../hooks/useTransactions';
 import { Button } from '../components/ui/button';
 import { ArrowLeft, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { TransactionTable } from '../components/transactions/TransactionTable';
 import { generateResellerExtract } from '../services/pdfService';
 import { useMemo } from 'react';
 
@@ -38,7 +38,7 @@ export default function ResellerDetailPage() {
 
     if (isLoading) {
         return (
-            <div className="p-6 flex justify-center text-muted-foreground">
+            <div className="p-4 lg:p-6 flex justify-center text-muted-foreground">
                 Carregando ficha do revendedor...
             </div>
         );
@@ -46,7 +46,7 @@ export default function ResellerDetailPage() {
 
     if (!reseller) {
         return (
-            <div className="p-6 flex flex-col items-center space-y-4">
+            <div className="p-4 lg:p-6 flex flex-col items-center space-y-4">
                 <p className="text-muted-foreground">Revendedor não encontrado.</p>
                 <Button onClick={() => navigate('/resellers')}>Voltar para Revendedores</Button>
             </div>
@@ -60,102 +60,76 @@ export default function ResellerDetailPage() {
     };
 
     return (
-        <div className="p-6 space-y-6">
-            <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="icon" onClick={() => navigate('/resellers')}>
+        <div className="p-4 lg:p-6 space-y-6">
+            <div className="flex items-center gap-4">
+                <Button variant="ghost" size="icon" onClick={() => navigate('/resellers')} className="shrink-0">
                     <ArrowLeft className="h-5 w-5" />
                 </Button>
-                <div className="flex-1">
-                    <h1 className="text-2xl font-bold tracking-tight">Ficha do Revendedor</h1>
-                    <p className="text-muted-foreground">
-                        Detalhes e histórico de transações.
+                <div className="flex-1 min-w-0">
+                    <h1 className="text-xl sm:text-2xl font-bold tracking-tight truncate">Ficha do Revendedor</h1>
+                    <p className="text-muted-foreground text-sm truncate">
+                        Visualizando dados de {reseller.name}
                     </p>
                 </div>
-                <Button onClick={handleGeneratePDF} variant="outline" className="flex items-center gap-2">
+                <Button onClick={handleGeneratePDF} variant="outline" size="sm" className="hidden sm:flex items-center gap-2">
                     <Download className="h-4 w-4" />
                     Gerar PDF
+                </Button>
+            </div>
+
+            <div className="flex sm:hidden">
+                <Button onClick={handleGeneratePDF} variant="outline" className="w-full flex items-center justify-center gap-2">
+                    <Download className="h-4 w-4" />
+                    Gerar PDF (Extrato)
                 </Button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Informações Pessoais</CardTitle>
+                        <CardTitle className="text-lg">Informações Pessoais</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-2">
-                        <div>
-                            <span className="font-medium">Nome:</span> {reseller.name}
+                    <CardContent className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                            <span className="font-medium text-muted-foreground">Nome:</span>
+                            <span>{reseller.name}</span>
                         </div>
-                        <div>
-                            <span className="font-medium">Telefone:</span> {reseller.phone || '-'}
+                        <div className="flex justify-between">
+                            <span className="font-medium text-muted-foreground">Telefone:</span>
+                            <span>{reseller.phone || '-'}</span>
                         </div>
-                        <div>
-                            <span className="font-medium">Email:</span> {reseller.email || '-'}
+                        <div className="flex justify-between">
+                            <span className="font-medium text-muted-foreground">Email:</span>
+                            <span>{reseller.email || '-'}</span>
                         </div>
                         {reseller.notes && (
-                            <div>
-                                <span className="font-medium">Observações:</span> {reseller.notes}
+                            <div className="pt-2 border-t mt-2">
+                                <span className="font-medium text-muted-foreground block mb-1">Observações:</span>
+                                <p className="text-xs italic">{reseller.notes}</p>
                             </div>
                         )}
                     </CardContent>
                 </Card>
 
-                <Card className={balance > 0 ? "border-red-200 bg-red-50 dark:bg-red-950 dark:border-red-900" : "border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-900"}>
+                <Card className={balance > 0 ? "border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900" : "border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-900"}>
                     <CardHeader>
-                        <CardTitle>Saldo Devedor Atual</CardTitle>
+                        <CardTitle className="text-lg text-center md:text-left">Saldo Devedor Atual</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <div className={`text-4xl font-bold ${balance > 0 ? "text-red-700 dark:text-red-400" : "text-green-700 dark:text-green-400"}`}>
+                    <CardContent className="flex flex-col items-center md:items-start">
+                        <div className={`text-4xl font-extrabold ${balance > 0 ? "text-red-700 dark:text-red-400" : "text-green-700 dark:text-green-400"}`}>
                             R$ {balance.toFixed(2)}
                         </div>
-                        <p className="text-sm text-muted-foreground mt-2">
-                            {balance > 0 ? "Restante a pagar" : balance < 0 ? "Crédito a favor" : "Tudo quitado"}
+                        <p className="text-sm font-medium mt-2 text-muted-foreground">
+                            {balance > 0 ? "⚠️ Débito pendente" : balance < 0 ? "✅ Crédito acumulado" : "✨ Saldo quitado"}
                         </p>
                     </CardContent>
                 </Card>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Histórico de Movimentações</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    {transactions && transactions.length > 0 ? (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Data</TableHead>
-                                    <TableHead>Tipo</TableHead>
-                                    <TableHead>Item</TableHead>
-                                    <TableHead>Qtd</TableHead>
-                                    <TableHead>Valor</TableHead>
-                                    <TableHead>Observação</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {transactions.map((t) => (
-                                    <TableRow key={t.id}>
-                                        <TableCell>{t.createdAt.toLocaleDateString()}</TableCell>
-                                        <TableCell>
-                                            {t.type === 'order' ? 'Pedido' : t.type === 'payment' ? 'Pagamento' : 'Sinal'}
-                                        </TableCell>
-                                        <TableCell>{t.itemName || '-'}</TableCell>
-                                        <TableCell>{t.quantity ? t.quantity : '-'}</TableCell>
-                                        <TableCell className={`font-medium ${t.type === 'order' ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-                                            R$ {t.totalPrice.toFixed(2)}
-                                        </TableCell>
-                                        <TableCell>{t.observation || '-'}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    ) : (
-                        <div className="text-center p-4 text-muted-foreground">
-                            Nenhuma movimentação encontrada.
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
+            <div className="space-y-4">
+                <h2 className="text-lg font-bold px-1">Histórico de Movimentações</h2>
+                <TransactionTable transactions={transactions} />
+            </div>
         </div>
     );
 }

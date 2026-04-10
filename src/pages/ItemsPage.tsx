@@ -5,12 +5,7 @@ import { ItemForm } from "../components/items/ItemForm";
 import type { Item } from "../db/database";
 import { Button } from "../components/ui/button";
 import { Plus } from "lucide-react";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "../components/ui/dialog";
+import { ResponsiveDialog } from "../components/ui/ResponsiveDialog";
 
 export default function ItemsPage() {
     const { data: items = [], isLoading } = useItems();
@@ -33,15 +28,15 @@ export default function ItemsPage() {
     };
 
     return (
-        <div className="p-6 space-y-6">
-            <div className="flex justify-between items-center">
+        <div className="p-4 lg:p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Catálogo de Itens</h1>
                     <p className="text-muted-foreground">
                         Gerencie os itens disponíveis para lançamento nos pedidos.
                     </p>
                 </div>
-                <Button onClick={handleCreateNew}>
+                <Button onClick={handleCreateNew} className="w-full sm:w-auto">
                     <Plus className="mr-2 h-4 w-4" />
                     Novo Item
                 </Button>
@@ -55,20 +50,17 @@ export default function ItemsPage() {
                 <ItemTable items={items} onEdit={handleEdit} />
             )}
 
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>
-                            {editingItem ? "Editar Item" : "Novo Item"}
-                        </DialogTitle>
-                    </DialogHeader>
-                    <ItemForm
-                        initialData={editingItem}
-                        onSubmitSuccess={handleCloseDialog}
-                        onCancel={handleCloseDialog}
-                    />
-                </DialogContent>
-            </Dialog>
+            <ResponsiveDialog
+                open={isDialogOpen}
+                onOpenChange={setIsDialogOpen}
+                title={editingItem ? "Editar Item" : "Novo Item"}
+            >
+                <ItemForm
+                    initialData={editingItem}
+                    onSubmitSuccess={handleCloseDialog}
+                    onCancel={handleCloseDialog}
+                />
+            </ResponsiveDialog>
         </div>
     );
 }

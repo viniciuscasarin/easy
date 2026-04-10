@@ -8,7 +8,7 @@ export default function DashboardPage() {
     const isLoading = isDebtLoading || isOrdersLoading;
 
     return (
-        <div className="p-6">
+        <div className="p-4 lg:p-6">
             <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
             <p className="mb-6 text-muted-foreground">Visão geral do negócio atualizada em tempo real.</p>
 

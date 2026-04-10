@@ -6,12 +6,7 @@ import type { Reseller } from "../db/database";
 import { Button } from "../components/ui/button";
 import { Plus, Search } from "lucide-react";
 import { Input } from "../components/ui/input";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "../components/ui/dialog";
+import { ResponsiveDialog } from "../components/ui/ResponsiveDialog";
 
 export default function ResellersPage() {
     const { data: resellers = [], isLoading } = useResellers();
@@ -43,15 +38,15 @@ export default function ResellersPage() {
     }, [resellers, searchQuery]);
 
     return (
-        <div className="p-6 space-y-6">
-            <div className="flex justify-between items-center">
+        <div className="p-4 lg:p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Revendedores</h1>
                     <p className="text-muted-foreground">
                         Gerencie sua rede de revendedores e acompanhe seus dados.
                     </p>
                 </div>
-                <Button onClick={handleCreateNew}>
+                <Button onClick={handleCreateNew} className="w-full sm:w-auto">
                     <Plus className="mr-2 h-4 w-4" />
                     Novo Revendedor
                 </Button>
@@ -78,20 +73,17 @@ export default function ResellersPage() {
                 <ResellerTable resellers={filteredResellers} onEdit={handleEdit} />
             )}
 
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>
-                            {editingReseller ? "Editar Revendedor" : "Novo Revendedor"}
-                        </DialogTitle>
-                    </DialogHeader>
-                    <ResellerForm
-                        initialData={editingReseller}
-                        onSubmitSuccess={handleCloseDialog}
-                        onCancel={handleCloseDialog}
-                    />
-                </DialogContent>
-            </Dialog>
+            <ResponsiveDialog
+                open={isDialogOpen}
+                onOpenChange={setIsDialogOpen}
+                title={editingReseller ? "Editar Revendedor" : "Novo Revendedor"}
+            >
+                <ResellerForm
+                    initialData={editingReseller}
+                    onSubmitSuccess={handleCloseDialog}
+                    onCancel={handleCloseDialog}
+                />
+            </ResponsiveDialog>
         </div>
     );
 }
