@@ -13,7 +13,7 @@ export function Sidebar() {
     return (
         <aside className="w-64 border-r bg-muted/40 min-h-screen flex flex-col">
             <div className="p-6 border-b flex items-center h-16">
-                <h2 className="text-lg font-semibold tracking-tight">Gestão Revendedores</h2>
+                <h2 className="text-lg font-semibold tracking-tight">Easy</h2>
             </div>
             <nav className="flex-1 py-4 space-y-1">
                 {routes.map((route) => (

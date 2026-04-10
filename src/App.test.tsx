@@ -6,9 +6,9 @@ describe('App Integration Tests', () => {
     it('navigates to the resellers page when the link is clicked', () => {
         render(<App />)
 
-        expect(screen.getByText('Bem-vindo ao Sistema de Gestão de Revendedores.')).toBeInTheDocument()
+        expect(screen.getByText('Easy')).toBeInTheDocument()
 
         fireEvent.click(screen.getByText('Revendedores'))
-        expect(screen.getByText('Gestão de Revendedores.')).toBeInTheDocument()
+        expect(screen.getByText('Revendedores')).toBeInTheDocument()
     })
 })

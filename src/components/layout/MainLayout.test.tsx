@@ -12,6 +12,6 @@ describe('MainLayout Component', () => {
         )
 
         // Sidebar brand text
-        expect(screen.getByText('Gestão Revendedores')).toBeInTheDocument()
+        expect(screen.getByText('Easy')).toBeInTheDocument()
     })
 })
