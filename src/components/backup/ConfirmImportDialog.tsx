@@ -1,5 +1,4 @@
 // src/components/backup/ConfirmImportDialog.tsx
-import React from 'react';
 import {
     Dialog,
     DialogContent,
@@ -28,8 +27,8 @@ export default function ConfirmImportDialog({ open, onOpenChange, onConfirm }: C
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                    <DialogClose asChild>
-                        <Button variant="outline">Cancel</Button>
+                    <DialogClose render={<Button variant="outline" />}>
+                        Cancel
                     </DialogClose>
                     <Button onClick={onConfirm}>Import</Button>
                 </DialogFooter>

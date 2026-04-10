@@ -29,7 +29,7 @@ export function useDeleteTransaction() {
     const queryClient = useQueryClient();
     // Using an object to receive both ID and resellerId to invalidate properly 
     return useMutation({
-        mutationFn: ({ id, resellerId }: { id: number; resellerId: number }) => db.transactions.delete(id),
+        mutationFn: ({ id, resellerId: _resellerId }: { id: number; resellerId: number }) => db.transactions.delete(id),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ['transactions'] });
             queryClient.invalidateQueries({ queryKey: ['transactions', variables.resellerId] });

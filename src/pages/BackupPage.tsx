@@ -1,5 +1,4 @@
 // src/pages/BackupPage.tsx
-import React from 'react';
 import ImportExport from '@/components/backup/ImportExport';
 
 export default function BackupPage() {

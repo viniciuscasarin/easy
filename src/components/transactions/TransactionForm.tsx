@@ -125,7 +125,7 @@ export function TransactionForm({ onSubmitSuccess, onCancel }: TransactionFormPr
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="resellerId">Revendedor</Label>
-                    <Select value={resellerId} onValueChange={setResellerId}>
+                    <Select value={resellerId} onValueChange={(val) => setResellerId(val ?? "")}>
                         <SelectTrigger id="resellerId">
                             <SelectValue>
                                 {resellerId ? resellers.find(r => r.id!.toString() === resellerId)?.name : "Selecione..."}
@@ -144,7 +144,7 @@ export function TransactionForm({ onSubmitSuccess, onCancel }: TransactionFormPr
 
                 <div className="space-y-2">
                     <Label htmlFor="type">Tipo de Movimentação</Label>
-                    <Select value={type} onValueChange={(val: TransactionType) => setType(val)}>
+                    <Select value={type} onValueChange={(val) => setType(val as TransactionType || "order")}>
                         <SelectTrigger id="type">
                             <SelectValue>
                                 {type === 'order' ? 'Pedido' : type === 'payment' ? 'Pagamento' : 'Sinal'}
@@ -164,7 +164,7 @@ export function TransactionForm({ onSubmitSuccess, onCancel }: TransactionFormPr
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="itemId">Item do Catálogo</Label>
-                            <Select value={itemId} onValueChange={setItemId}>
+                            <Select value={itemId} onValueChange={(val) => setItemId(val ?? "")}>
                                 <SelectTrigger id="itemId">
                                     <SelectValue>
                                         {itemId ? items.find(i => i.id!.toString() === itemId)?.name : "Selecione o item..."}
