@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useItems } from "../hooks/useItems";
 import { ItemTable } from "../components/items/ItemTable";
 import { ItemForm } from "../components/items/ItemForm";
@@ -8,9 +9,24 @@ import { Plus } from "lucide-react";
 import { ResponsiveDialog } from "../components/ui/ResponsiveDialog";
 
 export default function ItemsPage() {
+    const [searchParams, setSearchParams] = useSearchParams();
     const { data: items = [], isLoading } = useItems();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<Item | undefined>();
+
+    useEffect(() => {
+        const nameParam = searchParams.get("name");
+        if (nameParam) {
+            // Pre-fill creation
+            setEditingItem({ name: nameParam } as Item);
+            setIsDialogOpen(true);
+
+            // Clear the param after using it
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete("name");
+            setSearchParams(newParams, { replace: true });
+        }
+    }, [searchParams, setSearchParams]);
 
     const handleCreateNew = () => {
         setEditingItem(undefined);

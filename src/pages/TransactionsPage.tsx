@@ -1,9 +1,13 @@
-
+import { useSearchParams } from "react-router-dom";
 import { TransactionForm } from "../components/transactions/TransactionForm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { toast } from "sonner"; // If we add sonner
+import { toast } from "sonner";
+import type { TransactionType } from "../db/database";
 
 export default function TransactionsPage() {
+    const [searchParams] = useSearchParams();
+    const initialType = (searchParams.get("type") as TransactionType) || "order";
+
     const handleSuccess = () => {
         toast.success("Lançamento salvo com sucesso!");
     };
@@ -33,6 +37,8 @@ export default function TransactionsPage() {
                     <TransactionForm
                         onSubmitSuccess={handleSuccess}
                         onCancel={handleCancel}
+                        initialType={initialType}
+                        key={initialType} // Force remount when type changes
                     />
                 </CardContent>
             </Card>

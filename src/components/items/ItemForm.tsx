@@ -14,7 +14,7 @@ interface ItemFormProps {
 export function ItemForm({ initialData, onSubmitSuccess, onCancel }: ItemFormProps) {
     const [name, setName] = useState(initialData?.name || "");
     const [basePrice, setBasePrice] = useState(
-        initialData?.basePrice ? initialData.basePrice.toString() : ""
+        initialData?.basePrice !== undefined ? initialData.basePrice.toString() : ""
     );
     const [errors, setErrors] = useState<{ name?: string; basePrice?: string }>({});
 
@@ -24,8 +24,8 @@ export function ItemForm({ initialData, onSubmitSuccess, onCancel }: ItemFormPro
 
     useEffect(() => {
         if (initialData) {
-            setName(initialData.name);
-            setBasePrice(initialData.basePrice.toString());
+            setName(initialData.name || "");
+            setBasePrice(initialData.basePrice !== undefined ? initialData.basePrice.toString() : "");
         }
     }, [initialData]);
 

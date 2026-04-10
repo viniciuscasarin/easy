@@ -6,7 +6,8 @@ import { ArrowLeft, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { TransactionTable } from '../components/transactions/TransactionTable';
 import { generateResellerExtract } from '../services/pdfService';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
+import { addToRecentResellers } from '../hooks/useSearch';
 
 export default function ResellerDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -15,6 +16,12 @@ export default function ResellerDetailPage() {
 
     const { data: reseller, isLoading: isLoadingReseller } = useReseller(resellerId);
     const { data: transactionsData, isLoading: isLoadingTransactions } = useTransactions(resellerId);
+
+    useEffect(() => {
+        if (resellerId) {
+            addToRecentResellers(resellerId);
+        }
+    }, [resellerId]);
 
     const transactions = useMemo(() => {
         if (!transactionsData) return [];

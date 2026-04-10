@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useResellers } from "../hooks/useResellers";
 import { ResellerTable } from "../components/resellers/ResellerTable";
 import { ResellerForm } from "../components/resellers/ResellerForm";
@@ -9,10 +10,25 @@ import { Input } from "../components/ui/input";
 import { ResponsiveDialog } from "../components/ui/ResponsiveDialog";
 
 export default function ResellersPage() {
+    const [searchParams, setSearchParams] = useSearchParams();
     const { data: resellers = [], isLoading } = useResellers();
     const [searchQuery, setSearchQuery] = useState("");
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingReseller, setEditingReseller] = useState<Reseller | undefined>();
+
+    useEffect(() => {
+        const nameParam = searchParams.get("name");
+        if (nameParam) {
+            // Pre-fill creation
+            setEditingReseller({ name: nameParam } as Reseller);
+            setIsDialogOpen(true);
+
+            // Clear the param after using it
+            const newParams = new URLSearchParams(searchParams);
+            newParams.delete("name");
+            setSearchParams(newParams, { replace: true });
+        }
+    }, [searchParams, setSearchParams]);
 
     const handleCreateNew = () => {
         setEditingReseller(undefined);

@@ -17,11 +17,12 @@ import type { TransactionType } from "../../db/database";
 interface TransactionFormProps {
     onSubmitSuccess: () => void;
     onCancel: () => void;
+    initialType?: TransactionType;
 }
 
-export function TransactionForm({ onSubmitSuccess, onCancel }: TransactionFormProps) {
+export function TransactionForm({ onSubmitSuccess, onCancel, initialType = "order" }: TransactionFormProps) {
     const [resellerId, setResellerId] = useState<string>("");
-    const [type, setType] = useState<TransactionType>("order");
+    const [type, setType] = useState<TransactionType>(initialType);
 
     // Pass order fields
     const [itemId, setItemId] = useState<string>("");
