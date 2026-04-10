@@ -1,4 +1,6 @@
 # Easy Gestão de Demandas e Revendedores
+[![Deploy to GitHub Pages](https://github.com/viniciuscasarin/easy/actions/workflows/deploy.yml/badge.svg)](https://github.com/viniciuscasarin/easy/actions/workflows/deploy.yml)
+
 Este projeto é uma ferramenta de gestão financeira e de pedidos desenvolvida como um estudo prático de Spec-Driven Development (SDD). A aplicação foi construída para ser 100% client-side, rodando inteiramente no navegador sem a necessidade de um servidor ou banco de dados externo tradicional.
 
 # Funcionalidades
@@ -19,5 +21,3 @@ Este projeto foi projetado para ser portátil e independente.
 - Gere o build de produção: npm run build.
 
 A pasta dist gerada contém tudo o que é necessário. Como a aplicação utiliza client-side storage, ela pode ser hospedada em qualquer serviço estático (Vercel, Netlify, GitHub Pages) ou rodar localmente via um servidor HTTP simples.
-
-Nota: Por utilizar IndexedDB, os dados ficam armazenados localmente no navegador do usuário e são isolados por domínio.
