@@ -1,0 +1,117 @@
+import 'fake-indexeddb/auto';
+import React from 'react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import TransactionsPage from './TransactionsPage';
+import { db } from '../db/database';
+
+vi.mock('../components/ui/select', () => ({
+    Select: ({ value, onValueChange, children, ...props }: any) => (
+        <select
+            data-testid="mock-select"
+            value={value}
+            onChange={(e) => onValueChange(e.target.value)}
+            {...props}
+        >
+            {children}
+        </select>
+    ),
+    SelectContent: ({ children }: any) => <>{children}</>,
+    SelectItem: ({ value, children }: any) => <option value={value}>{children}</option>,
+    SelectTrigger: ({ children, id }: any) => <span id={id}>{children}</span>,
+    SelectValue: ({ placeholder, children }: any) => <option disabled value="">{children || placeholder}</option>,
+}));
+
+const queryClient = new QueryClient();
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>
+        {children}
+    </QueryClientProvider>
+);
+
+describe('TransactionsPage Integration', () => {
+    beforeEach(async () => {
+        await db.items.clear();
+        await db.resellers.clear();
+        await db.transactions.clear();
+        queryClient.clear();
+
+        // Default resize observer
+        globalThis.ResizeObserver = class ResizeObserver {
+            observe() { }
+            unobserve() { }
+            disconnect() { }
+        };
+
+        // Seed data needed for form
+        await db.items.add({ id: 1, name: 'Creme', basePrice: 50, createdAt: new Date(), updatedAt: new Date() });
+        await db.resellers.add({ id: 1, name: 'Mariazinha', createdAt: new Date(), updatedAt: new Date() });
+    });
+
+    it('executes the full order launch flow', async () => {
+        render(<TransactionsPage />, { wrapper });
+
+        // Change reseller
+        const selects = await screen.findAllByTestId('mock-select');
+
+        await waitFor(() => {
+            expect(screen.getByText('Mariazinha')).toBeInTheDocument();
+        });
+
+        // selects[0] Reseller, [1] Type, [2] Item
+        const resellerOption = screen.getByText('Mariazinha') as HTMLOptionElement;
+        fireEvent.change(selects[0], { target: { value: resellerOption.value } });
+
+        // Select Item
+        await waitFor(() => {
+            expect(screen.getByText(/Creme/)).toBeInTheDocument();
+        });
+        const itemOption = screen.getByText(/Creme/) as HTMLOptionElement;
+        fireEvent.change(selects[2], { target: { value: itemOption.value } });
+
+        // Put quantity 2
+        const qtyInput = await screen.findByLabelText(/Quantidade/i);
+        fireEvent.change(qtyInput, { target: { value: '2' } });
+
+        // Submit
+        fireEvent.submit(screen.getByRole('button', { name: /Lançar/i }));
+
+        await waitFor(async () => {
+            const transactions = await db.transactions.toArray();
+            expect(transactions.length).toBe(1);
+            expect(transactions[0].type).toBe('order');
+            expect(transactions[0].totalPrice).toBe(100);
+        });
+    });
+
+    it('executes the full payment launch flow', async () => {
+        render(<TransactionsPage />, { wrapper });
+
+        const selects = await screen.findAllByTestId('mock-select');
+
+        await waitFor(() => {
+            expect(screen.getByText('Mariazinha')).toBeInTheDocument();
+        });
+
+        // selects[0] Reseller
+        const resellerOption = screen.getByText('Mariazinha') as HTMLOptionElement;
+        fireEvent.change(selects[0], { target: { value: resellerOption.value } });
+
+        // Change type to payment
+        fireEvent.change(selects[1], { target: { value: 'payment' } });
+
+        const paymentValueInput = await screen.findByLabelText(/Valor para Abatimento/i);
+        fireEvent.change(paymentValueInput, { target: { value: '250.50' } });
+
+        // Submit
+        fireEvent.submit(screen.getByRole('button', { name: /Lançar/i }));
+
+        await waitFor(async () => {
+            const transactions = await db.transactions.toArray();
+            expect(transactions.length).toBe(1);
+            expect(transactions[0].type).toBe('payment');
+            expect(transactions[0].totalPrice).toBe(250.5);
+        });
+    });
+});
