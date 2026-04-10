@@ -1,0 +1,1 @@
+O projeto é uma SPA React desenvolvida com Vite e deve ser publicada no GitHub Pages. Preciso que configures o fluxo de automação para que, a cada push na branch main, o build seja feito e a página atualizada.
