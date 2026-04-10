@@ -1,0 +1,276 @@
+{
+    "version": 1,
+    "exportedAt": "2026-04-10T00:00:00.000Z",
+    "data": {
+        "items": [
+            {
+                "id": 1,
+                "name": "Perfume Floral 100ml",
+                "basePrice": 85.9,
+                "createdAt": "2026-01-01T10:00:00.000Z",
+                "updatedAt": "2026-01-01T10:00:00.000Z"
+            },
+            {
+                "id": 2,
+                "name": "Creme Hidratante Facial",
+                "basePrice": 45.0,
+                "createdAt": "2026-01-01T10:00:00.000Z",
+                "updatedAt": "2026-01-01T10:00:00.000Z"
+            },
+            {
+                "id": 3,
+                "name": "Batom Matte Red",
+                "basePrice": 29.9,
+                "createdAt": "2026-01-02T10:00:00.000Z",
+                "updatedAt": "2026-01-02T10:00:00.000Z"
+            },
+            {
+                "id": 4,
+                "name": "Shampoo Revitalizante",
+                "basePrice": 35.5,
+                "createdAt": "2026-01-03T10:00:00.000Z",
+                "updatedAt": "2026-04-01T10:00:00.000Z"
+            },
+            {
+                "id": 5,
+                "name": "Kit Presente Especial",
+                "basePrice": 150.0,
+                "createdAt": "2026-02-10T10:00:00.000Z",
+                "updatedAt": "2026-02-10T10:00:00.000Z"
+            }
+        ],
+        "resellers": [
+            {
+                "id": 1,
+                "name": "Maria Silva",
+                "phone": "(11) 98765-4321",
+                "email": "maria.silva@email.com",
+                "createdAt": "2026-01-10T10:00:00.000Z",
+                "updatedAt": "2026-01-10T10:00:00.000Z"
+            },
+            {
+                "id": 2,
+                "name": "João Pereira",
+                "phone": "(11) 91234-5678",
+                "email": "joao.p@email.com",
+                "createdAt": "2026-01-15T10:00:00.000Z",
+                "updatedAt": "2026-01-15T10:00:00.000Z"
+            },
+            {
+                "id": 3,
+                "name": "Ana Costa",
+                "phone": "(21) 99887-7665",
+                "email": "ana.costa@email.com",
+                "createdAt": "2026-02-01T10:00:00.000Z",
+                "updatedAt": "2026-02-01T10:00:00.000Z"
+            },
+            {
+                "id": 4,
+                "name": "Ricardo Santos",
+                "phone": "(31) 97766-5544",
+                "email": "ricardo.s@email.com",
+                "createdAt": "2026-02-05T10:00:00.000Z",
+                "updatedAt": "2026-02-05T10:00:00.000Z"
+            },
+            {
+                "id": 5,
+                "name": "Luciana Lima",
+                "phone": "(41) 96655-4433",
+                "email": "luciana.l@email.com",
+                "createdAt": "2026-02-10T10:00:00.000Z",
+                "updatedAt": "2026-02-10T10:00:00.000Z"
+            },
+            {
+                "id": 6,
+                "name": "Marcos Oliveira",
+                "phone": "(11) 95544-3322",
+                "email": "marcos.o@email.com",
+                "createdAt": "2026-02-15T10:00:00.000Z",
+                "updatedAt": "2026-02-15T10:00:00.000Z"
+            },
+            {
+                "id": 7,
+                "name": "Beatriz Rocha",
+                "phone": "(21) 94433-2211",
+                "email": "beatriz.r@email.com",
+                "createdAt": "2026-03-01T10:00:00.000Z",
+                "updatedAt": "2026-03-01T10:00:00.000Z"
+            },
+            {
+                "id": 8,
+                "name": "Fernando Souza",
+                "phone": "(31) 93322-1100",
+                "email": "fernando.s@email.com",
+                "createdAt": "2026-03-05T10:00:00.000Z",
+                "updatedAt": "2026-03-05T10:00:00.000Z"
+            },
+            {
+                "id": 9,
+                "name": "Camila Alves",
+                "phone": "(41) 92211-0099",
+                "email": "camila.a@email.com",
+                "createdAt": "2026-03-10T10:00:00.000Z",
+                "updatedAt": "2026-03-10T10:00:00.000Z"
+            },
+            {
+                "id": 10,
+                "name": "Pedro Martins",
+                "phone": "(11) 91100-9988",
+                "email": "pedro.m@email.com",
+                "createdAt": "2026-03-15T10:00:00.000Z",
+                "updatedAt": "2026-03-15T10:00:00.000Z"
+            }
+        ],
+        "transactions": [
+            {
+                "id": 1,
+                "resellerId": 1,
+                "type": "order",
+                "itemId": 1,
+                "itemName": "Perfume Floral 100ml",
+                "quantity": 10,
+                "unitPrice": 85.9,
+                "totalPrice": 859.0,
+                "createdAt": "2026-04-05T10:00:00.000Z"
+            },
+            {
+                "id": 2,
+                "resellerId": 1,
+                "type": "payment",
+                "totalPrice": 400.0,
+                "createdAt": "2026-04-06T14:00:00.000Z"
+            },
+            {
+                "id": 3,
+                "resellerId": 2,
+                "type": "order",
+                "itemId": 5,
+                "itemName": "Kit Presente Especial",
+                "quantity": 5,
+                "unitPrice": 150.0,
+                "totalPrice": 750.0,
+                "createdAt": "2026-03-20T10:00:00.000Z"
+            },
+            {
+                "id": 4,
+                "resellerId": 3,
+                "type": "order",
+                "itemId": 2,
+                "itemName": "Creme Hidratante Facial",
+                "quantity": 20,
+                "unitPrice": 45.0,
+                "totalPrice": 900.0,
+                "createdAt": "2026-02-15T10:00:00.000Z"
+            },
+            {
+                "id": 5,
+                "resellerId": 4,
+                "type": "order",
+                "itemId": 3,
+                "itemName": "Batom Matte Red",
+                "quantity": 50,
+                "unitPrice": 29.9,
+                "totalPrice": 1495.0,
+                "createdAt": "2026-02-10T10:00:00.000Z"
+            },
+            {
+                "id": 6,
+                "resellerId": 4,
+                "type": "payment",
+                "totalPrice": 500.0,
+                "createdAt": "2026-02-12T10:00:00.000Z"
+            },
+            {
+                "id": 7,
+                "resellerId": 5,
+                "type": "order",
+                "itemId": 1,
+                "itemName": "Perfume Floral 100ml",
+                "quantity": 2,
+                "unitPrice": 85.9,
+                "totalPrice": 171.8,
+                "createdAt": "2026-04-08T10:00:00.000Z"
+            },
+            {
+                "id": 8,
+                "resellerId": 6,
+                "type": "order",
+                "itemId": 4,
+                "itemName": "Shampoo Revitalizante",
+                "quantity": 30,
+                "unitPrice": 35.5,
+                "totalPrice": 1065.0,
+                "createdAt": "2026-03-25T10:00:00.000Z"
+            },
+            {
+                "id": 9,
+                "resellerId": 7,
+                "type": "order",
+                "itemId": 2,
+                "itemName": "Creme Hidratante Facial",
+                "quantity": 5,
+                "unitPrice": 45.0,
+                "totalPrice": 225.0,
+                "createdAt": "2026-04-09T10:00:00.000Z"
+            },
+            {
+                "id": 10,
+                "resellerId": 8,
+                "type": "order",
+                "itemId": 3,
+                "itemName": "Batom Matte Red",
+                "quantity": 100,
+                "unitPrice": 29.9,
+                "totalPrice": 2990.0,
+                "createdAt": "2026-01-20T10:00:00.000Z"
+            },
+            {
+                "id": 11,
+                "resellerId": 8,
+                "type": "payment",
+                "totalPrice": 1000.0,
+                "createdAt": "2026-01-25T10:00:00.000Z"
+            },
+            {
+                "id": 12,
+                "resellerId": 9,
+                "type": "order",
+                "itemId": 5,
+                "itemName": "Kit Presente Especial",
+                "quantity": 1,
+                "unitPrice": 150.0,
+                "totalPrice": 150.0,
+                "createdAt": "2026-03-05T10:00:00.000Z"
+            },
+            {
+                "id": 13,
+                "resellerId": 10,
+                "type": "order",
+                "itemId": 1,
+                "itemName": "Perfume Floral 100ml",
+                "quantity": 5,
+                "unitPrice": 85.9,
+                "totalPrice": 429.5,
+                "createdAt": "2026-04-01T10:00:00.000Z"
+            },
+            {
+                "id": 14,
+                "resellerId": 3,
+                "type": "payment",
+                "totalPrice": 100.0,
+                "createdAt": "2026-02-20T10:00:00.000Z"
+            },
+            {
+                "id": 15,
+                "resellerId": 4,
+                "type": "order",
+                "itemId": 2,
+                "itemName": "Creme Hidratante Facial",
+                "quantity": 10,
+                "unitPrice": 45.0,
+                "totalPrice": 450.0,
+                "createdAt": "2026-02-15T15:00:00.000Z"
+            }
+        ]
+    }
+}
