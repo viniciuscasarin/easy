@@ -148,21 +148,21 @@ export function useDebtAging() {
                     label: 'Recente (< 7d)',
                     value: buckets.recent,
                     percentage: totalDebt > 0 ? (buckets.recent / totalDebt) * 100 : 0,
-                    color: 'hsl(var(--success, 142 76% 36%))'
+                    color: '#22c55e' // Green-500
                 },
                 {
                     category: 'attention',
                     label: 'Em Atenção (8-30d)',
                     value: buckets.attention,
                     percentage: totalDebt > 0 ? (buckets.attention / totalDebt) * 100 : 0,
-                    color: 'hsl(var(--warning, 48 96% 53%))'
+                    color: '#eab308' // Yellow-500
                 },
                 {
                     category: 'critical',
                     label: 'Crítico (> 30d)',
                     value: buckets.critical,
                     percentage: totalDebt > 0 ? (buckets.critical / totalDebt) * 100 : 0,
-                    color: 'hsl(var(--destructive, 0 84% 60%))'
+                    color: '#ef4444' // Red-500
                 }
             ];
 
