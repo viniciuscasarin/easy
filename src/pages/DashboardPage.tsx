@@ -1,5 +1,6 @@
 import { DashboardCards } from '../components/dashboard/DashboardCards';
 import { DebtHealthAgingCard } from '../components/dashboard/DebtHealthAgingCard';
+import { PerformanceAnalysisSection } from '../components/dashboard/PerformanceAnalysisSection';
 import { useTotalDebt, useTodayOrders } from '../hooks/useDashboard';
 
 export default function DashboardPage() {
@@ -10,9 +11,9 @@ export default function DashboardPage() {
 
     return (
         <div className="p-4 lg:p-6 space-y-8">
-            <div>
-                <h1 className="text-2xl font-bold mb-1">Dashboard</h1>
-                <p className="text-muted-foreground">Visão geral do negócio atualizada em tempo real.</p>
+            <div className="space-y-1">
+                <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+                <p className="text-sm text-muted-foreground">Visão geral do negócio atualizada em tempo real.</p>
             </div>
 
             <DashboardCards
@@ -24,6 +25,10 @@ export default function DashboardPage() {
 
             <div className="w-full">
                 <DebtHealthAgingCard />
+            </div>
+
+            <div className="w-full">
+                <PerformanceAnalysisSection />
             </div>
         </div>
     );

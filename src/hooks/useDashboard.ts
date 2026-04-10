@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { db } from '../db/database';
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, subDays } from 'date-fns';
 
 export interface AgingData {
     category: 'recent' | 'attention' | 'critical';
@@ -20,8 +20,27 @@ export interface CriticalReseller {
 export interface DebtAgingResult {
     buckets: AgingData[];
     criticalResellers: CriticalReseller[];
+    attentionResellers: CriticalReseller[];
     totalDebt: number;
 }
+
+export interface PerformanceData {
+    pareto: {
+        resellerName: string;
+        revenue: number;
+        cumulativePercentage: number;
+    }[];
+    ranking: {
+        resellerName: string;
+        balance: number;
+    }[];
+    insights: {
+        countTo80: number;
+        topDebtor: { name: string; value: number } | null;
+    };
+}
+
+export type AnalysisPeriod = 90 | 180 | 360;
 
 export function useTotalDebt() {
     return useQuery({
@@ -109,6 +128,7 @@ export function useDebtAging() {
             };
 
             const criticalResellersList: CriticalReseller[] = [];
+            const attentionResellersList: CriticalReseller[] = [];
 
             resellerMap.forEach((data, id) => {
                 if (data.balance > 0.01) { // Deal with floating point precision
@@ -133,6 +153,13 @@ export function useDebtAging() {
 
                     if (category === 'critical') {
                         criticalResellersList.push({
+                            id,
+                            name: data.name,
+                            balance: data.balance,
+                            lastMovement: data.lastDate || new Date(0)
+                        });
+                    } else if (category === 'attention') {
+                        attentionResellersList.push({
                             id,
                             name: data.name,
                             balance: data.balance,
@@ -170,8 +197,100 @@ export function useDebtAging() {
                 buckets: resultBuckets,
                 criticalResellers: criticalResellersList
                     .sort((a, b) => b.balance - a.balance)
-                    .slice(0, 3),
+                    .slice(0, 10),
+                attentionResellers: attentionResellersList
+                    .sort((a, b) => b.balance - a.balance)
+                    .slice(0, 10),
                 totalDebt
+            };
+        }
+    });
+}
+
+export function usePerformanceAnalysis(days: AnalysisPeriod) {
+    return useQuery({
+        queryKey: ['dashboard', 'performance-analysis', days],
+        queryFn: async (): Promise<PerformanceData> => {
+            const resellers = await db.resellers.toArray();
+            const transactions = await db.transactions.toArray();
+            const startDate = subDays(new Date(), days);
+
+            const resellerMap = new Map<number, { name: string; revenue: number; balance: number }>();
+
+            // Initialize Map
+            resellers.forEach(r => {
+                if (r.id) {
+                    resellerMap.set(r.id, { name: r.name, revenue: 0, balance: 0 });
+                }
+            });
+
+            // Process all transactions for balance, but only recent for revenue
+            transactions.forEach(t => {
+                const data = resellerMap.get(t.resellerId);
+                if (data) {
+                    // Always update balance (total debt)
+                    if (t.type === 'order') {
+                        data.balance += t.totalPrice;
+                    } else {
+                        data.balance -= t.totalPrice;
+                    }
+
+                    // Update revenue only if within the period
+                    if (t.type === 'order' && t.createdAt >= startDate) {
+                        data.revenue += t.totalPrice;
+                    }
+                }
+            });
+
+            // Calculate Pareto
+            const sortedByRevenue = Array.from(resellerMap.values())
+                .filter(d => d.revenue > 0)
+                .sort((a, b) => b.revenue - a.revenue);
+
+            const totalRevenue = sortedByRevenue.reduce((sum, d) => sum + d.revenue, 0);
+            let runningTotal = 0;
+            let countTo80 = 0;
+            let reached80 = false;
+
+            const pareto = sortedByRevenue.map(d => {
+                runningTotal += d.revenue;
+                const cumulativePercentage = totalRevenue > 0 ? (runningTotal / totalRevenue) * 100 : 0;
+
+                if (!reached80) {
+                    countTo80++;
+                    if (cumulativePercentage >= 80) {
+                        reached80 = true;
+                    }
+                }
+
+                return {
+                    resellerName: d.name,
+                    revenue: d.revenue,
+                    cumulativePercentage
+                };
+            });
+
+            // Ranking by Debt
+            const ranking = Array.from(resellerMap.values())
+                .filter(d => d.balance > 0.01)
+                .sort((a, b) => b.balance - a.balance)
+                .slice(0, 10)
+                .map(d => ({
+                    resellerName: d.name,
+                    balance: d.balance
+                }));
+
+            const topDebtor = ranking.length > 0
+                ? { name: ranking[0].resellerName, value: ranking[0].balance }
+                : null;
+
+            return {
+                pareto,
+                ranking,
+                insights: {
+                    countTo80,
+                    topDebtor
+                }
             };
         }
     });
