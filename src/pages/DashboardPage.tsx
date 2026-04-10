@@ -1,4 +1,5 @@
 import { DashboardCards } from '../components/dashboard/DashboardCards';
+import { DebtHealthAgingCard } from '../components/dashboard/DebtHealthAgingCard';
 import { useTotalDebt, useTodayOrders } from '../hooks/useDashboard';
 
 export default function DashboardPage() {
@@ -8,9 +9,11 @@ export default function DashboardPage() {
     const isLoading = isDebtLoading || isOrdersLoading;
 
     return (
-        <div className="p-4 lg:p-6">
-            <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-            <p className="mb-6 text-muted-foreground">Visão geral do negócio atualizada em tempo real.</p>
+        <div className="p-4 lg:p-6 space-y-8">
+            <div>
+                <h1 className="text-2xl font-bold mb-1">Dashboard</h1>
+                <p className="text-muted-foreground">Visão geral do negócio atualizada em tempo real.</p>
+            </div>
 
             <DashboardCards
                 totalDebt={totalDebt}
@@ -18,6 +21,10 @@ export default function DashboardPage() {
                 todayOrdersVolume={todayOrders?.volume || 0}
                 isLoading={isLoading}
             />
+
+            <div className="w-full">
+                <DebtHealthAgingCard />
+            </div>
         </div>
     );
 }
