@@ -65,9 +65,9 @@ export function ParetoChart({ data }: ParetoChartProps) {
                                 tick={{ fontSize: 12 }}
                             />
                             <Tooltip
-                                formatter={(value: any, name: string) => {
-                                    if (name === 'Faturamento') return [formatBRL(value), name];
-                                    return [`${value.toFixed(1)}%`, name];
+                                formatter={(value: any, name: any) => {
+                                    if (name === 'Faturamento') return [formatBRL(Number(value)), name];
+                                    return [`${Number(value).toFixed(1)}%`, name];
                                 }}
                                 contentStyle={{
                                     borderRadius: '8px',

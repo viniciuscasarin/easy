@@ -54,7 +54,7 @@ export function PerformanceAnalysisSection() {
                     <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Janela:</span>
                     <Select
                         value={days.toString()}
-                        onValueChange={(val) => setDays(parseInt(val) as AnalysisPeriod)}
+                        onValueChange={(val) => setDays(parseInt(val || "0") as AnalysisPeriod)}
                     >
                         <SelectTrigger className="w-[160px]">
                             <SelectValue placeholder="Selecione o período" />

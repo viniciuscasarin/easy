@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, type Reseller, type Item } from '../db/database';
+import { db, type Reseller } from '../db/database';
 
 export interface SearchResult {
     id: number;

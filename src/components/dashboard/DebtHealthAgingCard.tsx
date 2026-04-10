@@ -75,7 +75,7 @@ export function DebtHealthAgingCard() {
                                             ))}
                                         </Pie>
                                         <Tooltip
-                                            formatter={(value: number) => formatBRL(value)}
+                                            formatter={(value: any) => formatBRL(Number(value))}
                                             contentStyle={{
                                                 borderRadius: '8px',
                                                 border: '1px solid hsl(var(--border))',

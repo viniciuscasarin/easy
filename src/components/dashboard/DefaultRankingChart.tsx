@@ -57,7 +57,7 @@ export function DefaultRankingChart({ data }: DefaultRankingChartProps) {
                                 width={120}
                             />
                             <Tooltip
-                                formatter={(value: number) => formatBRL(value)}
+                                formatter={(value: any) => formatBRL(Number(value))}
                                 labelStyle={{ fontWeight: 'bold' }}
                                 contentStyle={{
                                     borderRadius: '8px',
