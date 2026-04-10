@@ -10,7 +10,7 @@ import { Toaster } from './components/ui/sonner'
 
 function App() {
   return (
-    <BrowserRouter basename="/Easy/">
+    <BrowserRouter basename="/easy/">
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<DashboardPage />} />
