@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { generateResellerExtract } from './pdfService';
 
 const mockSave = vi.fn();
@@ -31,30 +31,62 @@ vi.mock('jspdf-autotable', () => ({
 import autoTable from 'jspdf-autotable';
 import { type Reseller, type Transaction } from '../db/database';
 
+const mockReseller: Reseller = {
+    id: 1,
+    name: 'John Doe',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+};
+
+const jan15 = new Date('2025-01-15T10:00:00');
+const feb10 = new Date('2025-02-10T10:00:00');
+const mar20 = new Date('2025-03-20T10:00:00');
+
+const mockTransactions: Transaction[] = [
+    { id: 1, resellerId: 1, type: 'order', totalPrice: 100, createdAt: jan15 },
+    { id: 2, resellerId: 1, type: 'payment', totalPrice: 50, createdAt: feb10 },
+    { id: 3, resellerId: 1, type: 'order', totalPrice: 200, createdAt: mar20 },
+];
+
 describe('pdfService', () => {
-    it('generates PDF without errors', () => {
-        const mockReseller: Reseller = {
-            id: 1,
-            name: 'John Doe',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        };
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
 
-        const mockTransactions: Transaction[] = [
-            {
-                id: 1,
-                resellerId: 1,
-                type: 'order',
-                totalPrice: 100,
-                createdAt: new Date(),
-            }
-        ];
-
+    it('generates PDF without errors (sem filtro — comportamento atual preservado)', () => {
         generateResellerExtract(mockReseller, mockTransactions, 100);
 
         expect(mockSave).toHaveBeenCalledWith('extrato_john_doe.pdf');
         expect(autoTable).toHaveBeenCalled();
         expect(mockText).toHaveBeenCalledWith('Nome: John Doe', 14, 40);
         expect(mockSetTextColor).toHaveBeenCalledWith(220, 38, 38);
+    });
+
+    it('gera PDF com dateRange — autoTable chamado apenas com transações do período', () => {
+        const dateRange = {
+            startDate: new Date('2025-01-01T00:00:00'),
+            endDate: new Date('2025-02-28T23:59:59'),
+        };
+
+        generateResellerExtract(mockReseller, mockTransactions, 50, dateRange);
+
+        expect(autoTable).toHaveBeenCalled();
+        const callArgs = vi.mocked(autoTable).mock.calls[0][1];
+        // Apenas as transações de jan e fev devem estar no body (não a de mar)
+        expect(callArgs.body).toHaveLength(2);
+    });
+
+    it('gera PDF com dateRange — nome do arquivo inclui as datas formatadas', () => {
+        const dateRange = {
+            startDate: new Date('2025-01-01T00:00:00'),
+            endDate: new Date('2025-03-31T23:59:59'),
+        };
+
+        generateResellerExtract(mockReseller, mockTransactions, 250, dateRange);
+
+        expect(mockSave).toHaveBeenCalledWith(
+            expect.stringMatching(/^extrato_john_doe_\d{2}-\d{2}-\d{4}_a_\d{2}-\d{2}-\d{4}\.pdf$/)
+        );
+        expect(mockSave).not.toHaveBeenCalledWith('extrato_john_doe.pdf');
     });
 });

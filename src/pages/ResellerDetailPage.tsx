@@ -6,8 +6,11 @@ import { ArrowLeft, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { TransactionTable } from '../components/transactions/TransactionTable';
 import { generateResellerExtract } from '../services/pdfService';
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { addToRecentResellers } from '../hooks/useSearch';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { toast } from 'sonner';
 
 export default function ResellerDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -16,6 +19,8 @@ export default function ResellerDetailPage() {
 
     const { data: reseller, isLoading: isLoadingReseller } = useReseller(resellerId);
     const { data: transactionsData, isLoading: isLoadingTransactions } = useTransactions(resellerId);
+
+    const [dateFilter, setDateFilter] = useState({ startDate: '', endDate: '' });
 
     useEffect(() => {
         if (resellerId) {
@@ -41,6 +46,26 @@ export default function ResellerDetailPage() {
         return totalOrders - totalPayments;
     }, [transactions]);
 
+    const hasFilter = dateFilter.startDate !== '' || dateFilter.endDate !== '';
+    const isFilterComplete = dateFilter.startDate !== '' && dateFilter.endDate !== '';
+    const isPdfButtonDisabled = hasFilter && !isFilterComplete;
+
+    // Transações exibidas na tabela: filtradas pelo período quando ambas as datas estão preenchidas e válidas
+    const displayedTransactions = useMemo(() => {
+        if (!isFilterComplete) return transactions;
+        const startDate = new Date(dateFilter.startDate + 'T00:00:00');
+        const endDate = new Date(dateFilter.endDate + 'T23:59:59');
+        if (startDate > endDate) return transactions;
+        return transactions.filter(t => t.createdAt >= startDate && t.createdAt <= endDate);
+    }, [transactions, isFilterComplete, dateFilter.startDate, dateFilter.endDate]);
+
+    // Saldo exibido: recalculado sobre as transações filtradas
+    const displayedBalance = useMemo(() => {
+        const totalOrders = displayedTransactions.filter(t => t.type === 'order').reduce((s, t) => s + t.totalPrice, 0);
+        const totalPayments = displayedTransactions.filter(t => t.type !== 'order').reduce((s, t) => s + t.totalPrice, 0);
+        return totalOrders - totalPayments;
+    }, [displayedTransactions]);
+
     const isLoading = isLoadingReseller || isLoadingTransactions;
 
     if (isLoading) {
@@ -61,7 +86,32 @@ export default function ResellerDetailPage() {
     }
 
     const handleGeneratePDF = () => {
-        if (transactions) {
+        if (!transactions) return;
+
+        if (isFilterComplete) {
+            const startDate = new Date(dateFilter.startDate + 'T00:00:00');
+            const endDate = new Date(dateFilter.endDate + 'T23:59:59');
+
+            if (startDate > endDate) {
+                toast.error('A data de início não pode ser posterior à data de fim.');
+                return;
+            }
+
+            const filtered = transactions.filter(
+                t => t.createdAt >= startDate && t.createdAt <= endDate
+            );
+
+            if (filtered.length === 0) {
+                toast.warning('Nenhuma transação encontrada no período selecionado.');
+                return;
+            }
+
+            const filteredBalance =
+                filtered.filter(t => t.type === 'order').reduce((s, t) => s + t.totalPrice, 0) -
+                filtered.filter(t => t.type !== 'order').reduce((s, t) => s + t.totalPrice, 0);
+
+            generateResellerExtract(reseller, filtered, filteredBalance, { startDate, endDate });
+        } else {
             generateResellerExtract(reseller, transactions, balance);
         }
     };
@@ -78,16 +128,38 @@ export default function ResellerDetailPage() {
                         Visualizando dados de {reseller.name}
                     </p>
                 </div>
-                <Button onClick={handleGeneratePDF} variant="outline" size="sm" className="hidden sm:flex items-center gap-2">
-                    <Download className="h-4 w-4" />
-                    Gerar PDF
-                </Button>
             </div>
 
-            <div className="flex sm:hidden">
-                <Button onClick={handleGeneratePDF} variant="outline" className="w-full flex items-center justify-center gap-2">
+            {/* Filtro de datas e geração de PDF */}
+            <div className="flex flex-col sm:flex-row gap-3 items-end">
+                <div className="flex flex-col gap-1">
+                    <Label htmlFor="startDate">Data Início</Label>
+                    <Input
+                        id="startDate"
+                        type="date"
+                        value={dateFilter.startDate}
+                        onChange={e => setDateFilter(prev => ({ ...prev, startDate: e.target.value }))}
+                        className="w-full sm:w-40"
+                    />
+                </div>
+                <div className="flex flex-col gap-1">
+                    <Label htmlFor="endDate">Data Fim</Label>
+                    <Input
+                        id="endDate"
+                        type="date"
+                        value={dateFilter.endDate}
+                        onChange={e => setDateFilter(prev => ({ ...prev, endDate: e.target.value }))}
+                        className="w-full sm:w-40"
+                    />
+                </div>
+                <Button
+                    onClick={handleGeneratePDF}
+                    variant="outline"
+                    disabled={isPdfButtonDisabled}
+                    className="flex items-center gap-2 w-full sm:w-auto"
+                >
                     <Download className="h-4 w-4" />
-                    Gerar PDF (Extrato)
+                    Gerar PDF
                 </Button>
             </div>
 
@@ -118,24 +190,38 @@ export default function ResellerDetailPage() {
                     </CardContent>
                 </Card>
 
-                <Card className={balance > 0 ? "border-debt/20 bg-debt/5" : "border-payment/20 bg-payment/5"}>
+                <Card className={displayedBalance > 0 ? "border-debt/20 bg-debt/5" : "border-payment/20 bg-payment/5"}>
                     <CardHeader>
-                        <CardTitle className="text-lg text-center md:text-left">Saldo Devedor Atual</CardTitle>
+                        <CardTitle className="text-lg text-center md:text-left">
+                            {isFilterComplete ? 'Saldo do Período' : 'Saldo Devedor Atual'}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent className="flex flex-col items-center md:items-start">
-                        <div className={`text-4xl font-extrabold ${balance > 0 ? "text-debt" : "text-payment"}`}>
-                            R$ {balance.toFixed(2)}
+                        <div className={`text-4xl font-extrabold ${displayedBalance > 0 ? "text-debt" : "text-payment"}`}>
+                            R$ {displayedBalance.toFixed(2)}
                         </div>
                         <p className="text-sm font-medium mt-2 text-muted-foreground">
-                            {balance > 0 ? "⚠️ Débito pendente" : balance < 0 ? "✅ Crédito acumulado" : "✨ Saldo quitado"}
+                            {displayedBalance > 0 ? "⚠️ Débito pendente" : displayedBalance < 0 ? "✅ Crédito acumulado" : "✨ Saldo quitado"}
                         </p>
+                        {isFilterComplete && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                                Saldo total: R$ {balance.toFixed(2)}
+                            </p>
+                        )}
                     </CardContent>
                 </Card>
             </div>
 
             <div className="space-y-4">
-                <h2 className="text-lg font-bold px-1">Histórico de Movimentações</h2>
-                <TransactionTable transactions={transactions} />
+                <h2 className="text-lg font-bold px-1">
+                    Histórico de Movimentações
+                    {isFilterComplete && (
+                        <span className="ml-2 text-sm font-normal text-muted-foreground">
+                            ({new Date(dateFilter.startDate + 'T00:00:00').toLocaleDateString('pt-BR')} a {new Date(dateFilter.endDate + 'T00:00:00').toLocaleDateString('pt-BR')})
+                        </span>
+                    )}
+                </h2>
+                <TransactionTable transactions={displayedTransactions} />
             </div>
         </div>
     );

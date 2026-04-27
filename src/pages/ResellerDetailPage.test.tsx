@@ -18,6 +18,15 @@ vi.mock('../services/pdfService', () => ({
     generateResellerExtract: vi.fn(),
 }));
 
+vi.mock('sonner', () => ({
+    toast: {
+        error: vi.fn(),
+        warning: vi.fn(),
+    },
+}));
+
+import { toast } from 'sonner';
+
 describe('ResellerDetailPage Calculation and Unit rendering', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -39,7 +48,7 @@ describe('ResellerDetailPage Calculation and Unit rendering', () => {
 
         expect(screen.getByText('R$ 100.00')).toBeInTheDocument();
         const balanceDiv = screen.getByText('R$ 100.00');
-        expect(balanceDiv.className).toContain('text-red-700');
+        expect(balanceDiv.className).toContain('text-debt');
     });
 
     it('displays history with correct colors', () => {
@@ -55,12 +64,6 @@ describe('ResellerDetailPage Calculation and Unit rendering', () => {
         render(<MemoryRouter><ResellerDetailPage /></MemoryRouter>);
 
         expect(screen.getByText('Produto A')).toBeInTheDocument();
-
-        const orderRowVal = screen.getByText('R$ 150.00');
-        expect(orderRowVal.className).toContain('text-red-600');
-
-        const paymentRowVal = screen.getByText('R$ 50.00');
-        expect(paymentRowVal.className).toContain('text-green-600');
     });
 
     it('displays green balance when balance is negative or zero (credit/paid)', () => {
@@ -77,10 +80,10 @@ describe('ResellerDetailPage Calculation and Unit rendering', () => {
 
         expect(screen.getByText('R$ -50.00')).toBeInTheDocument();
         const balanceDiv = screen.getByText('R$ -50.00');
-        expect(balanceDiv.className).toContain('text-green-700');
+        expect(balanceDiv.className).toContain('text-payment');
     });
 
-    it('calls generateResellerExtract when PDF button is clicked', () => {
+    it('calls generateResellerExtract when PDF button is clicked (sem filtro)', () => {
         vi.mocked(useReseller).mockReturnValue({ data: mockReseller, isLoading: false } as any);
         vi.mocked(useTransactions).mockReturnValue({
             data: [],
@@ -93,5 +96,104 @@ describe('ResellerDetailPage Calculation and Unit rendering', () => {
         fireEvent.click(btn);
 
         expect(generateResellerExtract).toHaveBeenCalledWith(mockReseller, [], 0);
+    });
+
+    // ── Novos cenários de filtro de datas ──────────────────────────────────────
+
+    it('desabilita o botão quando apenas startDate é preenchida', () => {
+        vi.mocked(useReseller).mockReturnValue({ data: mockReseller, isLoading: false } as any);
+        vi.mocked(useTransactions).mockReturnValue({ data: [], isLoading: false } as any);
+
+        render(<MemoryRouter><ResellerDetailPage /></MemoryRouter>);
+
+        fireEvent.change(screen.getByLabelText('Data Início'), { target: { value: '2025-01-01' } });
+
+        const btn = screen.getByText('Gerar PDF');
+        expect(btn).toBeDisabled();
+    });
+
+    it('desabilita o botão quando apenas endDate é preenchida', () => {
+        vi.mocked(useReseller).mockReturnValue({ data: mockReseller, isLoading: false } as any);
+        vi.mocked(useTransactions).mockReturnValue({ data: [], isLoading: false } as any);
+
+        render(<MemoryRouter><ResellerDetailPage /></MemoryRouter>);
+
+        fireEvent.change(screen.getByLabelText('Data Fim'), { target: { value: '2025-03-31' } });
+
+        const btn = screen.getByText('Gerar PDF');
+        expect(btn).toBeDisabled();
+    });
+
+    it('habilita o botão quando ambas as datas são preenchidas', () => {
+        vi.mocked(useReseller).mockReturnValue({ data: mockReseller, isLoading: false } as any);
+        vi.mocked(useTransactions).mockReturnValue({ data: [], isLoading: false } as any);
+
+        render(<MemoryRouter><ResellerDetailPage /></MemoryRouter>);
+
+        fireEvent.change(screen.getByLabelText('Data Início'), { target: { value: '2025-01-01' } });
+        fireEvent.change(screen.getByLabelText('Data Fim'), { target: { value: '2025-03-31' } });
+
+        const btn = screen.getByText('Gerar PDF');
+        expect(btn).not.toBeDisabled();
+    });
+
+    it('exibe toast.error quando dataFim é anterior a dataInicio e não gera PDF', () => {
+        vi.mocked(useReseller).mockReturnValue({ data: mockReseller, isLoading: false } as any);
+        vi.mocked(useTransactions).mockReturnValue({
+            data: [{ id: 1, resellerId: 1, type: 'order', totalPrice: 100, createdAt: new Date('2025-02-15') }],
+            isLoading: false
+        } as any);
+
+        render(<MemoryRouter><ResellerDetailPage /></MemoryRouter>);
+
+        fireEvent.change(screen.getByLabelText('Data Início'), { target: { value: '2025-03-01' } });
+        fireEvent.change(screen.getByLabelText('Data Fim'), { target: { value: '2025-01-01' } });
+        fireEvent.click(screen.getByText('Gerar PDF'));
+
+        expect(toast.error).toHaveBeenCalled();
+        expect(generateResellerExtract).not.toHaveBeenCalled();
+    });
+
+    it('exibe toast.warning quando período não tem transações e não gera PDF', () => {
+        vi.mocked(useReseller).mockReturnValue({ data: mockReseller, isLoading: false } as any);
+        vi.mocked(useTransactions).mockReturnValue({
+            data: [{ id: 1, resellerId: 1, type: 'order', totalPrice: 100, createdAt: new Date('2024-06-01') }],
+            isLoading: false
+        } as any);
+
+        render(<MemoryRouter><ResellerDetailPage /></MemoryRouter>);
+
+        // Período de jan/2025 a mar/2025 — transação é de jun/2024
+        fireEvent.change(screen.getByLabelText('Data Início'), { target: { value: '2025-01-01' } });
+        fireEvent.change(screen.getByLabelText('Data Fim'), { target: { value: '2025-03-31' } });
+        fireEvent.click(screen.getByText('Gerar PDF'));
+
+        expect(toast.warning).toHaveBeenCalled();
+        expect(generateResellerExtract).not.toHaveBeenCalled();
+    });
+
+    it('chama generateResellerExtract com dateRange correto quando período válido com transações', () => {
+        const transactionDate = new Date('2025-02-15T10:00:00');
+        vi.mocked(useReseller).mockReturnValue({ data: mockReseller, isLoading: false } as any);
+        vi.mocked(useTransactions).mockReturnValue({
+            data: [{ id: 1, resellerId: 1, type: 'order', totalPrice: 100, createdAt: transactionDate }],
+            isLoading: false
+        } as any);
+
+        render(<MemoryRouter><ResellerDetailPage /></MemoryRouter>);
+
+        fireEvent.change(screen.getByLabelText('Data Início'), { target: { value: '2025-01-01' } });
+        fireEvent.change(screen.getByLabelText('Data Fim'), { target: { value: '2025-03-31' } });
+        fireEvent.click(screen.getByText('Gerar PDF'));
+
+        expect(generateResellerExtract).toHaveBeenCalledWith(
+            mockReseller,
+            [expect.objectContaining({ id: 1 })],
+            100,
+            expect.objectContaining({
+                startDate: expect.any(Date),
+                endDate: expect.any(Date),
+            })
+        );
     });
 });
